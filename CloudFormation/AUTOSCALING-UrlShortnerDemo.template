@@ -1,0 +1,230 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "UrlShortnerDemo Auto Scaling Group",
+    "Parameters": {
+		"Ami": {
+			"Default": "ami-f9dd458a",
+			"Type": "String"
+		},
+        "Instance": {
+            "Default": "c3.large",
+            "Description": "Instance Type",
+            "Type": "String",
+            "AllowedValues": [ "t2.small", "c3.large", "c3.xlarge", "c3.2xlarge", "c4.large", "c4.xlarge", "c4.2xlarge" ]
+        },
+        "NumberOfInstances": {
+            "Default": "2",
+            "Description": "Number Of Instances (0-60)",
+            "Type": "String",
+            "AllowedValues": [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60" ]
+        }
+    },
+    "Resources": {
+	  "VPC": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/16",
+        "EnableDnsSupport": "true",
+        "EnableDnsHostnames": "true",
+        "Tags": [
+          {
+            "Key": "Application",
+            "Value": {
+              "Ref": "AWS::StackId"
+            }
+          },
+          {
+            "Key": "Partition",
+            "Value": "Global"
+          }
+        ]
+      }
+    },
+    "Subnet1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "AvailabilityZone": "eu-west-1a",
+        "CidrBlock": "10.0.0.0/24",
+        "MapPublicIpOnLaunch": "true",
+        "Tags": [
+          {
+            "Key": "Application",
+            "Value": {
+              "Ref": "AWS::StackId"
+            }
+          },
+          {
+            "Key": "Partition",
+            "Value": "Global"
+          },
+		  {
+            "Key": "Function",
+            "Value": "Public"
+          }
+        ]
+      }
+    },
+    "Subnet2": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "AvailabilityZone": "eu-west-1b",
+        "CidrBlock": "10.0.1.0/24",
+        "MapPublicIpOnLaunch": "true",
+        "Tags": [
+          {
+            "Key": "Application",
+            "Value": {
+              "Ref": "AWS::StackId"
+            }
+          },
+          {
+            "Key": "Partition",
+            "Value": "Global"
+          },
+		  {
+            "Key": "Function",
+            "Value": "Public"
+          }
+        ]
+      }
+    },
+    "Subnet3": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "AvailabilityZone": "eu-west-1c",
+        "CidrBlock": "10.0.2.0/24",
+        "MapPublicIpOnLaunch": "true",
+        "Tags": [
+          {
+            "Key": "Application",
+            "Value": {
+              "Ref": "AWS::StackId"
+            }
+          },
+          {
+            "Key": "Partition",
+            "Value": "Global"
+          },
+		  {
+            "Key": "Function",
+            "Value": "Public"
+          }
+        ]
+      }
+    },
+	"UrlShortnerDemoELBHTTPSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "GroupDescription": "UrlShortnerDemo ELB http access",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+	"UrlShortnerDemoLoadBalancer" : {
+       "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+       "Properties": {
+          "CrossZone" : "true",
+          "HealthCheck" : {
+             "HealthyThreshold" : "3",
+             "Interval" : "6",
+             "Target" : "HTTPS:443/HealthCheck",
+             "Timeout" : "5",
+             "UnhealthyThreshold" : "3"
+          },
+          "LoadBalancerName" : "UrlShortnerDemo-Global",
+          "Listeners" : [ 
+            {
+               "InstancePort" : "80",
+               "InstanceProtocol" : "HTTP",
+               "LoadBalancerPort" : "80",
+               "Protocol" : "HTTP"
+            }
+          ],
+          "Scheme" : "internet-facing",
+          "SecurityGroups" : [ { "Ref" : "UrlShortnerDemoELBHTTPSecurityGroup" } ],
+          "Subnets" : [ { "Ref" : "Subnet1" }, { "Ref" : "Subnet2" }, { "Ref" : "Subnet3" } ]
+       }
+    },
+
+	"UrlShortnerDemoSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "GroupDescription": "SelfService instances ",
+        "SecurityGroupIngress": [
+		            {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "SourceSecurityGroupId": { "Ref": "UrlShortnerDemoELBHTTPSecurityGroup" }
+          },
+	  	  {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "0.0.0.0/0"
+          }
+
+        ]
+      }
+    },
+
+
+        "QueueFrontGroup": {
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "Properties": {
+				"VPCZoneIdentifier" : [ { "Ref" : "Subnet1" }, { "Ref" : "Subnet2" }, { "Ref" : "Subnet3" } ],
+                "LaunchConfigurationName": { "Ref": "UrlDemoLaunchConfig" },
+                "DesiredCapacity": { "Ref": "NumberOfInstances" },
+                "MinSize": { "Ref": "NumberOfInstances" },
+                "MaxSize": "60",
+                "HealthCheckGracePeriod": "1200",
+                "HealthCheckType": "EC2",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "UrlShortnerDemo",
+                        "PropagateAtLaunch": "true"
+                    }
+                ]
+            },
+            "UpdatePolicy": {
+                "AutoScalingRollingUpdate": {
+                    "MaxBatchSize": "1",
+                    "MinInstancesInService": { "Ref": "NumberOfInstances" },
+                    "PauseTime": "PT5M0S"
+                }
+            }
+        },
+		"UrlDemoLaunchConfig": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "Properties": {
+                "ImageId": { "Ref": "Ami" },
+                "SecurityGroups": { "Ref": "UrlShortnerDemoSecurityGroup" },
+                "InstanceType": { "Ref": "Instance" },
+                "IamInstanceProfile": { "Fn::FindInMap": [ "IAMProfileMap", { "Ref": "AWS::Region" }, { "Ref": "Environment" } ] }
+            }
+        }
+
+  }
+}

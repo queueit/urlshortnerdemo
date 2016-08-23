@@ -12,7 +12,7 @@ hooks:
       runas: root
   ApplicationStop:
     - location: scripts/deregister_from_elb.sh
-    - location: stop_httpd.sh
+     runas: root
   ApplicationStart:
-    - location: scripts/start_httpd.sh
     - location: register_with_elb.sh
+      runas: root

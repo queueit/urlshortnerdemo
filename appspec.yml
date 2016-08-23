@@ -1,0 +1,9 @@
+version: 0.0
+os: linux
+files:
+   - source: /
+     destination: /var/urlshortnerdemo
+hooks:
+   AfterInstall:
+    - location: scripts/dotnetrun.sh
+      runas: root

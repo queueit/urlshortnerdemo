@@ -1,2 +1,2 @@
 #!/bin/bash
-killall dotnet
+killall dotnet || true

@@ -7,10 +7,3 @@ hooks:
    AfterInstall:
     - location: scripts/dotnetrun.sh
       runas: root
-   BeforeInstall:
-    - location: scripts/dotnetstop.sh
-      runas: root
-  ApplicationStop:
-    - location: scripts/deregister_from_elb.sh
-  ApplicationStart:
-    - location: scripts/register_with_elb.sh

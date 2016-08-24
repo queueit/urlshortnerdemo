@@ -153,7 +153,7 @@
                 "HealthCheck" : {
                     "HealthyThreshold" : "3",
                     "Interval"         : "6",
-                    "Target"           : "HTTPS:443/HealthCheck",
+                    "Target"           : "HTTPS:80/HealthCheck",
                     "Timeout"          : "5",
                     "UnhealthyThreshold" : "3"
                 },

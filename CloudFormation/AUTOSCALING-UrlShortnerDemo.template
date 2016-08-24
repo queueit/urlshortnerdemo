@@ -225,7 +225,7 @@
                                 "dynamodb:GetItem"
                             ],
                             "Effect" : "Allow",
-                            "Resource" : "arn:aws:dynamodb:eu-west-1:*:*"
+                            "Resource" : "arn:aws:dynamodb:eu-west-1:*"
                         },
 						{
                             "Sid" : "Deployment",

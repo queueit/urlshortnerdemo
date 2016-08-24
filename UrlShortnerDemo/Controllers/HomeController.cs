@@ -2,34 +2,54 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Amazon;
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DataModel;
+using Amazon.Runtime;
 using Microsoft.AspNetCore.Mvc;
+using UrlShortnerDemo.Models;
+using UrlShortnerDemo.Plumming;
 
 namespace UrlShortnerDemo.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        public ActionResult Index()
         {
             return View();
         }
 
-        public IActionResult About()
+        [HttpPost]
+        public async Task<ActionResult> Index(UrlModel model)
         {
-            ViewData["Message"] = "Your application description page.";
+            model.Key = GenerateKey();
+            model.Created = DateTime.UtcNow.ToString("O");
+            model.User = "testuser";
+            model.ShortenedUrl = GenerateShortUrl(model.Key);
 
-            return View();
+            await AddToDynamo(model);
+
+            return View(model);
         }
 
-        public IActionResult Contact()
+        private async Task AddToDynamo(UrlModel model)
         {
-            ViewData["Message"] = "Your contact page.";
 
-            return View();
+            AmazonDynamoDBClient client = new AmazonDynamoDBClient(RegionEndpoint.EUWest1);
+            DynamoDBContext context = new DynamoDBContext(client);
+
+            await context.SaveAsync(model);
+
         }
 
-        public IActionResult Error()
+        private string GenerateShortUrl(string key)
         {
-            return View();
+            return "http://url.realvaluetalks.com/in/" + key;
+        }
+
+        private string GenerateKey()
+        {
+            return Guid.NewGuid().ToString().Substring(0, 8);
         }
     }
 }

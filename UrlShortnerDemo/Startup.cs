@@ -65,7 +65,13 @@ namespace UrlShortnerDemo
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Home}/{key?}",
+                    defaults: new { action = "Index" });
+                //routes.MapRoute(
+                //    name: "Dedefaultfault",
+                //    url: "{controller}/{key}",
+                //    defaults: new { controller = "Home", action = "Index", key = UrlParameter.Optional }
+
             });
         }
     }

@@ -3,7 +3,7 @@
     "Description"              : "UrlShortnerDemo Auto Scaling Group",
     "Parameters"               : {
         "Ami" : {
-            "Default" : "ami-ed82e39e",
+            "Default" : "ami-ef582e9c",
             "Type"    : "String"
         },
         "Instance" : {
@@ -107,6 +107,27 @@
                 }
             }
         },
+		"RouteTable"          : {
+            "Type" : "AWS::EC2::RouteTable",
+            "Properties" : {
+                "VpcId" : {
+                    "Ref" : "VPC"
+                }
+			}
+        },
+        "RouteToInternet" : {
+            "Type" : "AWS::EC2::Route",
+            "DependsOn" : "AttachGateway",
+            "Properties" : {
+                "RouteTableId" : {
+                    "Ref" : "RouteTable"
+                },
+                "DestinationCidrBlock" : "0.0.0.0/0",
+                "GatewayId"            : {
+                    "Ref" : "InternetGateway"
+                }
+            }
+        },
 
         "LoadBalancerSecurityGroup" : {
             "Type" : "AWS::EC2::SecurityGroup",
@@ -139,7 +160,7 @@
                 "LoadBalancerName" : "UrlShortnerDemo-Global",
                 "Listeners"        : [
                     {
-                        "InstancePort" : "80",
+                        "InstancePort" : "5000",
                         "InstanceProtocol" : "HTTP",
                         "LoadBalancerPort" : "80",
                         "Protocol"         : "HTTP"
@@ -205,6 +226,22 @@
                             ],
                             "Effect" : "Allow",
                             "Resource" : "arn:aws:dynamodb:eu-west-1:*:*"
+                        },
+						{
+                            "Sid" : "Deployment",
+                            "Action" : [
+								"elasticloadbalancing:Describe*",
+								"elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+								"elasticloadbalancing:RegisterInstancesWithLoadBalancer",
+								"autoscaling:Describe*",
+								"autoscaling:EnterStandby",
+								"autoscaling:ExitStandby",
+								"autoscaling:UpdateAutoScalingGroup",
+								"autoscaling:SuspendProcesses",
+								"autoscaling:ResumeProcesses"
+                            ],
+                            "Effect" : "Allow",
+                            "Resource" : "*"
                         }
                     ]
                 }
@@ -254,8 +291,8 @@
                 "SecurityGroupIngress" : [
                     {
                         "IpProtocol" : "tcp",
-                        "FromPort"   : "80",
-                        "ToPort"     : "80",
+                        "FromPort"   : "5000",
+                        "ToPort"     : "5000",
                         "SourceSecurityGroupId" : {
                             "Ref" : "LoadBalancerSecurityGroup"
                         }
@@ -328,7 +365,8 @@
                 },
                 "IamInstanceProfile" : {
                     "Ref" : "InstanceProfile"
-                }
+                },
+				"KeyName": "UrlShortner"
             }
         },
         "AppScaleDownPolicy"            : {

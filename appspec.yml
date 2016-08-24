@@ -4,7 +4,7 @@ files:
    - source: /
      destination: /var/urlshortnerdemo
 hooks:
-   BeforeInstall:
+   ApplicationStop:
     - location: scripts/dotnetstop.sh
       runas: root
    AfterInstall:

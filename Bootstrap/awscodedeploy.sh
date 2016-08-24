@@ -12,4 +12,4 @@ chmod +x ./install
 ./install auto
 
 apt-get install python-pip
-pip install awscli
+pip install --upgrade awscli

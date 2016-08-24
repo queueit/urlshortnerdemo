@@ -7,3 +7,5 @@ hooks:
    AfterInstall:
     - location: scripts/dotnetrun.sh
       runas: root
+   ApplicationStart:
+    - location: scripts/register_with_elb.sh

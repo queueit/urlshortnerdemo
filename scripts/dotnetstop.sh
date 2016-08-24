@@ -1,2 +1,4 @@
 #!/bin/bash
-killall dotnet
+killall dotnet --quiet
+
+exit 0

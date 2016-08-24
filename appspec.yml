@@ -4,8 +4,13 @@ files:
    - source: /
      destination: /var/urlshortnerdemo
 hooks:
+   BeforeInstall:
+    - location: scripts/dotnetstop.sh
+      runas: root
    AfterInstall:
     - location: scripts/dotnetrun.sh
       runas: root
    ApplicationStart:
     - location: scripts/register_with_elb.sh
+   ApplicationStop:
+    - location: scripts/deregister_from_elb.sh

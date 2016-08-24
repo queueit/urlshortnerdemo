@@ -10,3 +10,6 @@ export AWS_SECRET_ACCESS_KEY=sla1BhYFAPPSTQoFMtmmxloK2ktRYHY6kSZMx+bf
 aws s3 cp s3://aws-codedeploy-eu-west-1/latest/install . --region eu-west-1
 chmod +x ./install
 ./install auto
+
+apt-get install python-pip
+pip install awscli

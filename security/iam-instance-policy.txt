@@ -13,22 +13,6 @@
             ]
         },
         {
-            "Sid" : "Deployment",
-            "Action" : [
-		"elasticloadbalancing:Describe*",
-		"elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
-		"elasticloadbalancing:RegisterInstancesWithLoadBalancer",
-		"autoscaling:Describe*",
-		"autoscaling:EnterStandby",
-		"autoscaling:ExitStandby",
-		"autoscaling:UpdateAutoScalingGroup",
-		"autoscaling:SuspendProcesses",
-		"autoscaling:ResumeProcesses"
-            ],
-            "Effect" : "Allow",
-            "Resource" : "*"
-        },
-        {
             "Sid" : "ReadWriteDynamoDB",
             "Action" : [
                 "dynamodb:Query",

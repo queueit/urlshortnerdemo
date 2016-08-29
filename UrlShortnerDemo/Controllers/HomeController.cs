@@ -20,6 +20,7 @@ namespace UrlShortnerDemo.Controllers
         }
 
         [HttpPost]
+        [IgnoreAntiforgeryToken]
         public async Task<ActionResult> Index(UrlModel model)
         {
             model.UrlKey = GenerateKey();

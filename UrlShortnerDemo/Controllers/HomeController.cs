@@ -8,7 +8,6 @@ using Amazon.DynamoDBv2.DataModel;
 using Amazon.Runtime;
 using Microsoft.AspNetCore.Mvc;
 using UrlShortnerDemo.Models;
-using UrlShortnerDemo.Plumming;
 
 namespace UrlShortnerDemo.Controllers
 {

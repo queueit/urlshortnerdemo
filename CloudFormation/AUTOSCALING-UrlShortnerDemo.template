@@ -117,7 +117,7 @@
         },
         "RouteToInternet" : {
             "Type" : "AWS::EC2::Route",
-            "DependsOn" : "AttachGateway",
+            "DependsOn" : [ "InternetGateway", "AttachGateway", "RouteTable"],
             "Properties" : {
                 "RouteTableId" : {
                     "Ref" : "RouteTable"
@@ -125,6 +125,39 @@
                 "DestinationCidrBlock" : "0.0.0.0/0",
                 "GatewayId"            : {
                     "Ref" : "InternetGateway"
+                }
+            }
+        },
+		"Subnet1RouteTableAssociation" : {
+            "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties" : {
+                "SubnetId" : {
+                    "Ref" : "Subnet1"
+                },
+                "RouteTableId" : {
+                    "Ref" : "RouteTable"
+                }
+            }
+        },
+        "Subnet2RouteTableAssociation" : {
+            "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties" : {
+                "SubnetId" : {
+                    "Ref" : "Subnet2"
+                },
+                "RouteTableId" : {
+                    "Ref" : "RouteTable"
+                }
+            }
+        },
+        "Subnet3RouteTableAssociation" : {
+            "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties" : {
+                "SubnetId" : {
+                    "Ref" : "Subnet3"
+                },
+                "RouteTableId" : {
+                    "Ref" : "RouteTable"
                 }
             }
         },
@@ -216,7 +249,7 @@
                     "Version" : "2012-10-17",
                     "Statement" : [
                         {
-                            "Sid" : "ReadFromDynamoDB",
+                            "Sid" : "ReadWriteDynamoDB",
                             "Action" : [
                                 "dynamodb:Query",
                                 "dynamodb:DescribeTable",

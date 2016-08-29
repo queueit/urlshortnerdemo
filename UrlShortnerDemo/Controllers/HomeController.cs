@@ -22,10 +22,10 @@ namespace UrlShortnerDemo.Controllers
         [HttpPost]
         public async Task<ActionResult> Index(UrlModel model)
         {
-            model.Key = GenerateKey();
-            model.Created = DateTime.UtcNow.ToString("O");
+            model.UrlKey = GenerateKey();
+            model.Created = DateTime.UtcNow;
             model.User = "testuser";
-            model.ShortenedUrl = GenerateShortUrl(model.Key);
+            model.ShortenedUrl = GenerateShortUrl(model.UrlKey);
 
             await AddToDynamo(model);
 

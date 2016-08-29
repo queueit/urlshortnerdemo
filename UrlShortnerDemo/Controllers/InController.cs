@@ -8,6 +8,7 @@ using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.Model;
 using Amazon.Runtime;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using UrlShortnerDemo.Models;
 using UrlShortnerDemo.Plumming;
 
@@ -26,45 +27,45 @@ namespace UrlShortnerDemo.Controllers
             if (model == null)
                 return Redirect("/");
 
-            await LogRedirect(key, client);
+            await LogRedirect(key, context);
 
             return Redirect(model.Url);
         }
 
         private async Task<UrlModel> LoadModel(string key, DynamoDBContext context)
         {
-            UrlModel model = await context.LoadAsync<UrlModel>(key);
-            return model;
+            return await context.LoadAsync<UrlModel>(key);
         }
 
-        private async Task LogRedirect(string key, AmazonDynamoDBClient client)
+        private async Task LogRedirect(string key, DynamoDBContext context)
         {
-            string userMetadata = this.Request.Headers["User-Agent"];
+            string userAgent = this.GetUserAgent();
+            string ipAddress = this.GetIpAddress();
 
-            await client.UpdateItemAsync(new UpdateItemRequest(
-                "Urls",
-                new Dictionary<string, AttributeValue>() { { "Key", new AttributeValue() { S = key } } },
-                new Dictionary<string, AttributeValueUpdate>()
+            await context.SaveAsync(new UrlVisitModel()
+            {
+                VisitId = Guid.NewGuid(),
+                UrlKey = key,
+                Visited = DateTime.Now,
+                User = new UserVisitModel()
                 {
-                    {
-                        "Redirected", new AttributeValueUpdate(new AttributeValue()
-                        {
-                            L = new List<AttributeValue>()
-                            {
-                                new AttributeValue
-                                {
-                                    M = new Dictionary<string, AttributeValue>()
-                                    {
-                                        {"RedirectTime", new AttributeValue() {S = DateTime.UtcNow.ToString("O")}},
-                                        {"UserAgent", new AttributeValue() {S = userMetadata}}
-                                    }
-                                }
-                            }
-                        },
-                        AttributeAction.ADD)
-                    }
-                })
-            );
+                    IpAddress = ipAddress,
+                    UserAgent = userAgent
+                }
+            });
+        }
+
+        private StringValues GetUserAgent()
+        {
+            return this.Request.Headers["User-Agent"];
+        }
+
+        private string GetIpAddress()
+        {
+            if (this.Request.Headers.ContainsKey("X-ForwardedFor"))
+                return this.Request.Headers["X-ForwardedFor"];
+
+            return this.Request.Host.Host;
         }
     }
 }

@@ -5,4 +5,6 @@ sudo apt-get update
 
 sudo apt-get install dotnet-dev-1.0.0-preview2-003121 -y
 
+sudo apt-get install supervisor -y
+
 sudo iptables -A INPUT -p tcp --dport 5000 -j ACCEPT

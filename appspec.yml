@@ -1,8 +1,10 @@
 version: 0.0
 os: linux
 files:
-   - source: /
-     destination: /var/urlshortnerdemo
+   - source: /published/
+     destination: /var/urlshortnerdemo/
+   - source: /scripts/supervisor/
+     destination: /etc/supervisor/conf.d/
 hooks:
    ApplicationStop:
     - location: scripts/dotnetstop.sh

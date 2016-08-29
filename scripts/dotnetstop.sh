@@ -1,4 +1,4 @@
 #!/bin/bash
-killall dotnet --quiet
+sudo service supervisor stop
 
 exit 0

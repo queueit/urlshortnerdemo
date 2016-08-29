@@ -33,6 +33,12 @@ namespace UrlShortnerDemo.Controllers
             return View(model);
         }
 
+        public ActionResult Error()
+        {
+            return View();
+        }
+
+
         private async Task AddToDynamo(UrlModel model)
         {
 

@@ -185,10 +185,10 @@
                 "CrossZone" : "true",
                 "HealthCheck" : {
                     "HealthyThreshold" : "3",
-                    "Interval"         : "6",
+                    "Interval"         : "30",
                     "Target"           : "HTTP:5000/HealthCheck",
-                    "Timeout"          : "5",
-                    "UnhealthyThreshold" : "3"
+                    "Timeout"          : "25",
+                    "UnhealthyThreshold" : "5"
                 },
                 "LoadBalancerName" : "UrlShortnerDemo",
                 "Listeners"        : [

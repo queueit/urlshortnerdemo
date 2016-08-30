@@ -13,13 +13,8 @@ using UrlShortnerDemo.Models;
 
 namespace UrlShortnerDemo.Controllers
 {
-    public class HomeController : Controller
+    public class LoadHomeController : Controller
     {
-        public ActionResult Index()
-        {
-            return View();
-        }
-
         [HttpPost]
         [IgnoreAntiforgeryToken]
         public async Task<ActionResult> Index(UrlModel model)
@@ -29,8 +24,18 @@ namespace UrlShortnerDemo.Controllers
             model.User = "testuser";
             model.ShortenedUrl = GenerateShortUrl(model.UrlKey);
 
-            await AddToDynamo(model);
-
+            using (HttpClient client = new HttpClient())
+            {
+                var json = "{\"TableName\": \"Urls\",\"Item\": {" +
+                           "\"UrlKey\": {\"S\": \"" + model.UrlKey + "\"}," +
+                           "\"Created\": {\"S\": \"" + model.Created.ToString("O") + "\" }," +
+                           "\"ShortenedUrl\": {\"S\": \"" + model.ShortenedUrl + "\"}," +
+                           "\"Url\": {\"S\": \"" + model.Url + "\"}," +
+                           "\"User\": {\"S\": \"" + model.User + "\"}}}";
+                var response = await client.PutAsync(
+                    "https://fai9q0sn2g.execute-api.eu-west-1.amazonaws.com/test/url",
+                    new StringContent(json));
+            }
             return View(model);
         }
 
@@ -46,7 +51,7 @@ namespace UrlShortnerDemo.Controllers
             {
                 using (DynamoDBContext Context = new DynamoDBContext(client))
                 {
-                    await Context.SaveAsync(model);
+                    await Context.SaveAsync(model).ConfigureAwait(false);
                 }
             }
         }

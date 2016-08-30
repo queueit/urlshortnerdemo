@@ -15,20 +15,24 @@ namespace UrlShortnerDemo.Controllers
 {
     public class InController : Controller
     {
-        
+
         public async Task<ActionResult> Index(string key)
         {
-            AmazonDynamoDBClient client = new AmazonDynamoDBClient(RegionEndpoint.EUWest1);
-            DynamoDBContext context = new DynamoDBContext(client);
+            using (var client = new AmazonDynamoDBClient(RegionEndpoint.EUWest1))
+            {
+                using (DynamoDBContext context = new DynamoDBContext(client))
+                {
 
-            var model = await LoadModel(key, context);
+                    var model = await LoadModel(key, context);
 
-            if (model == null)
-                return Redirect("/");
+                    if (model == null)
+                        return Redirect("/");
 
-            await LogRedirect(key, context);
+                    await LogRedirect(key, context);
 
-            return Redirect(model.Url);
+                    return Redirect(model.Url);
+                }
+            }
         }
 
         private async Task<UrlModel> LoadModel(string key, DynamoDBContext context)

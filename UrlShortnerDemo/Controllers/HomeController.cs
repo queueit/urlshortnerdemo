@@ -18,6 +18,15 @@ namespace UrlShortnerDemo.Controllers
             return View();
         }
 
+        public async Task<ActionResult> Delay()
+        {
+
+            await Task.Delay(30000);
+
+            return Json(new {delay = "ok"});
+        }
+
+
         [HttpPost]
         [IgnoreAntiforgeryToken]
         public async Task<ActionResult> Index(UrlModel model)

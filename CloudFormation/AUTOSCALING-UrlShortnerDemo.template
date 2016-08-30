@@ -3,7 +3,7 @@
     "Description"              : "UrlShortnerDemo Auto Scaling Group",
     "Parameters"               : {
         "Ami" : {
-            "Default" : "ami-779aea04",
+            "Default" : "ami-f3fd8d80",
             "Type"    : "String"
         },
         "Instance" : {

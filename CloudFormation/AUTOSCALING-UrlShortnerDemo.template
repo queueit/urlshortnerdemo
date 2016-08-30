@@ -7,7 +7,7 @@
             "Type"    : "String"
         },
         "Instance" : {
-            "Default" : "c3.large",
+            "Default" : "c3.2xlarge",
             "Description" : "Instance Type",
             "Type"        : "String",
             "AllowedValues" : [
@@ -379,11 +379,11 @@
             },
             "UpdatePolicy" : {
                 "AutoScalingRollingUpdate" : {
-                    "MaxBatchSize" : "1",
+                    "MaxBatchSize" : "6",
                     "MinInstancesInService" : {
                         "Ref" : "NumberOfInstances"
                     },
-                    "PauseTime"             : "PT5M0S"
+                    "PauseTime"             : "PT3M0S"
                 }
             }
         },

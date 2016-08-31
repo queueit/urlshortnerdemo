@@ -44,9 +44,9 @@ namespace UrlShortnerDemo.Controllers
         {
             using (var client = new AmazonDynamoDBClient(RegionEndpoint.EUWest1))
             {
-                using (DynamoDBContext Context = new DynamoDBContext(client))
+                using (DynamoDBContext context = new DynamoDBContext(client))
                 {
-                    await Context.SaveAsync(model);
+                    await context.SaveAsync(model);
                 }
             }
         }

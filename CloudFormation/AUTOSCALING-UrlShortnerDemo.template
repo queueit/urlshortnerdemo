@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion" : "2010-09-09",
-    "Description"              : "UrlShortnerDemo Auto Scaling Group",
+    "Description"              : "UrlShortnerDemo Environment",
     "Parameters"               : {
         "Ami" : {
             "Default" : "ami-f3fd8d80",
@@ -15,14 +15,16 @@
                 "c3.large",
                 "c3.xlarge",
                 "c3.2xlarge",
+                "c3.4xlarge",
                 "c4.large",
                 "c4.xlarge",
-                "c4.2xlarge"
+                "c4.2xlarge",
+                "c4.4xlarge"
             ]
         },
         "NumberOfInstances" : {
             "Default" : "0",
-            "Description" : "Number Of Instances (0-60)",
+            "Description" : "Number Of Instances (0-20)",
             "Type"        : "String",
             "AllowedValues" : [
                 "0",
@@ -37,15 +39,7 @@
                 "9",
                 "10",
                 "15",
-                "20",
-                "25",
-                "30",
-                "35",
-                "40",
-                "45",
-                "50",
-                "55",
-                "60"
+                "20"
             ]
         }
     },
@@ -183,39 +177,21 @@
             "Type" : "AWS::ElasticLoadBalancing::LoadBalancer",
             "Properties" : {
                 "CrossZone" : "true",
-                "HealthCheck" : {
-                    "HealthyThreshold" : "3",
-                    "Interval"         : "30",
-                    "Target"           : "HTTP:5000/HealthCheck",
-                    "Timeout"          : "25",
-                    "UnhealthyThreshold" : "5"
-                },
+                "HealthCheck" : { "HealthyThreshold"   : "3",
+								  "Interval"           : "30",
+								  "Target"             : "HTTP:5000/HealthCheck",
+								  "Timeout"            : "25",
+								  "UnhealthyThreshold" : "5" },
                 "LoadBalancerName" : "UrlShortnerDemo",
-                "Listeners"        : [
-                    {
-                        "InstancePort" : "5000",
-                        "InstanceProtocol" : "HTTP",
-                        "LoadBalancerPort" : "80",
-                        "Protocol"         : "HTTP"
-                    }
-                ],
+                "Listeners"        : [{ "InstancePort"	   : "5000",
+										"InstanceProtocol" : "HTTP",
+										"LoadBalancerPort" : "80",
+										 "Protocol"        : "HTTP"}],
                 "Scheme"           : "internet-facing",
-                "SecurityGroups"   : [
-                    {
-                        "Ref" : "LoadBalancerSecurityGroup"
-                    }
-                ],
-                "Subnets"          : [
-                    {
-                        "Ref" : "Subnet1"
-                    },
-                    {
-                        "Ref" : "Subnet2"
-                    },
-                    {
-                        "Ref" : "Subnet3"
-                    }
-                ]
+                "SecurityGroups"   : [{"Ref" : "LoadBalancerSecurityGroup"}],
+                "Subnets"          : [{"Ref" : "Subnet1"},
+                                      {"Ref" : "Subnet2"},
+									  {"Ref" : "Subnet3"}]
             }
         },
 		"DNSRecord"                                       : {
@@ -497,3 +473,4 @@
         }
     }
 }
+

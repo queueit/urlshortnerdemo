@@ -26,6 +26,30 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{6110
 		scripts\dotnetrun.sh = scripts\dotnetrun.sh
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Security", "Security", "{3597A571-4BC5-46F2-9A15-1FEF1AD7643F}"
+	ProjectSection(SolutionItems) = preProject
+		security\iam-instance-policy.txt = security\iam-instance-policy.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{0ABCF05E-95B4-4ACB-9E3A-311872FA465B}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\common_functions.sh = scripts\common_functions.sh
+		scripts\deregister_from_elb.sh = scripts\deregister_from_elb.sh
+		scripts\dotnetrun.sh = scripts\dotnetrun.sh
+		scripts\dotnetstop.sh = scripts\dotnetstop.sh
+		scripts\register_with_elb.sh = scripts\register_with_elb.sh
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "supervisor", "supervisor", "{9DF172B5-52E7-48CD-B266-BF0DC8F1682C}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\supervisor\urlshortnerdemo.conf = scripts\supervisor\urlshortnerdemo.conf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "loadtest", "loadtest", "{44F2734D-9724-467E-8F54-89F76A7717C8}"
+	ProjectSection(SolutionItems) = preProject
+		loadtest\UrlShortnerDemo.scala = loadtest\UrlShortnerDemo.scala
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +66,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6110FBDD-5373-41EF-A64A-2BBE90A00A0D} = {4CB732FB-5C05-4193-B9A9-C23E51F718B9}
+		{9DF172B5-52E7-48CD-B266-BF0DC8F1682C} = {0ABCF05E-95B4-4ACB-9E3A-311872FA465B}
 	EndGlobalSection
 EndGlobal

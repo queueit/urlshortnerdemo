@@ -22,39 +22,32 @@ namespace UrlShortnerDemo.Controllers
 
         [HttpPost]
         [IgnoreAntiforgeryToken]
-        public ActionResult Index(UrlModel model)
+        public async Task<ActionResult> Index(UrlModel model)
         {
             model.UrlKey = GenerateKey();
             model.Created = DateTime.UtcNow;
             model.User = "testuser";
             model.ShortenedUrl = GenerateShortUrl(model.UrlKey);
 
-            AddToDynamo(model);
+            await AddToDynamo(model).ConfigureAwait(false);
 
             return View(model);
+        }
+
+        private async Task AddToDynamo(UrlModel model)
+        {
+            using (var client = new AmazonDynamoDBClient(RegionEndpoint.EUWest1))
+            {
+                using (DynamoDBContext context = new DynamoDBContext(client))
+                {
+                    await context.SaveAsync(model).ConfigureAwait(false);
+                }
+            }
         }
 
         public ActionResult Error()
         {
             return View();
-        }
-
-        public static void GetResult(Task task)
-        {
-            task.ConfigureAwait(false);
-            task.Wait();
-        }
-
-        private void AddToDynamo(UrlModel model)
-        {
-            
-            using (var client = new AmazonDynamoDBClient(RegionEndpoint.EUWest1))
-            {
-                using (DynamoDBContext context = new DynamoDBContext(client))
-                {
-                    GetResult(context.SaveAsync(model));
-                }
-            }
         }
 
         private string GenerateShortUrl(string key)

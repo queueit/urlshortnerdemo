@@ -16,36 +16,36 @@ namespace UrlShortnerDemo.Controllers
     public class InController : Controller
     {
 
-        public ActionResult Index(string key)
+        public async Task<ActionResult> Index(string key)
         {
             using (var client = new AmazonDynamoDBClient(RegionEndpoint.EUWest1))
             {
                 using (DynamoDBContext context = new DynamoDBContext(client))
                 {
 
-                    var model = LoadModel(key, context);
+                    var model = await LoadModel(key, context).ConfigureAwait(false);
 
                     if (model == null)
                         return Redirect("/");
 
-                    LogRedirect(key, context);
+                    await LogRedirect(key, context).ConfigureAwait(false);
 
                     return Redirect(model.Url);
                 }
             }
         }
 
-        private UrlModel LoadModel(string key, DynamoDBContext context)
+        private async Task<UrlModel> LoadModel(string key, DynamoDBContext context)
         {
-            return GetResult(context.LoadAsync<UrlModel>(key));
+            return await context.LoadAsync<UrlModel>(key).ConfigureAwait(false);
         }
 
-        private void LogRedirect(string key, DynamoDBContext context)
+        private async Task LogRedirect(string key, DynamoDBContext context)
         {
             string userAgent = this.GetUserAgent();
             string ipAddress = this.GetIpAddress();
 
-            GetResult(context.SaveAsync(new UrlVisitModel()
+            await context.SaveAsync(new UrlVisitModel()
             {
                 VisitId = Guid.NewGuid(),
                 UrlKey = key,
@@ -55,21 +55,7 @@ namespace UrlShortnerDemo.Controllers
                     IpAddress = ipAddress,
                     UserAgent = userAgent
                 }
-            }));
-        }
-
-        public static void GetResult(Task task)
-        {
-            task.ConfigureAwait(false);
-            task.Wait();
-        }
-
-        public static T GetResult<T>(Task<T> task)
-        {
-            task.ConfigureAwait(false);
-            task.Wait();
-
-            return task.Result;
+            }).ConfigureAwait(false);
         }
 
         private StringValues GetUserAgent()

@@ -101,17 +101,21 @@
                 }
             }
         },
-		"RouteTable"          : {
+        "RouteTable"      : {
             "Type" : "AWS::EC2::RouteTable",
             "Properties" : {
                 "VpcId" : {
                     "Ref" : "VPC"
                 }
-			}
+            }
         },
         "RouteToInternet" : {
             "Type" : "AWS::EC2::Route",
-            "DependsOn" : [ "InternetGateway", "AttachGateway", "RouteTable"],
+            "DependsOn" : [
+                "InternetGateway",
+                "AttachGateway",
+                "RouteTable"
+            ],
             "Properties" : {
                 "RouteTableId" : {
                     "Ref" : "RouteTable"
@@ -122,7 +126,7 @@
                 }
             }
         },
-		"Subnet1RouteTableAssociation" : {
+        "Subnet1RouteTableAssociation" : {
             "Type" : "AWS::EC2::SubnetRouteTableAssociation",
             "Properties" : {
                 "SubnetId" : {
@@ -155,8 +159,7 @@
                 }
             }
         },
-
-        "LoadBalancerSecurityGroup" : {
+        "LoadBalancerSecurityGroup"    : {
             "Type" : "AWS::EC2::SecurityGroup",
             "Properties" : {
                 "VpcId" : {
@@ -173,28 +176,46 @@
                 ]
             }
         },
-        "LoadBalancer"         : {
+        "LoadBalancer"                 : {
             "Type" : "AWS::ElasticLoadBalancing::LoadBalancer",
             "Properties" : {
                 "CrossZone" : "true",
-                "HealthCheck" : { "HealthyThreshold"   : "3",
-								  "Interval"           : "30",
-								  "Target"             : "HTTP:5000/HealthCheck",
-								  "Timeout"            : "25",
-								  "UnhealthyThreshold" : "5" },
+                "HealthCheck" : {
+                    "HealthyThreshold" : "2",
+                    "Interval"         : "30",
+                    "Target"           : "HTTP:5000/HealthCheck",
+                    "Timeout"          : "25",
+                    "UnhealthyThreshold" : "5"
+                },
                 "LoadBalancerName" : "UrlShortnerDemo",
-                "Listeners"        : [{ "InstancePort"	   : "5000",
-										"InstanceProtocol" : "HTTP",
-										"LoadBalancerPort" : "80",
-										 "Protocol"        : "HTTP"}],
+                "Listeners"        : [
+                    {
+                        "InstancePort" : "5000",
+                        "InstanceProtocol" : "HTTP",
+                        "LoadBalancerPort" : "80",
+                        "Protocol"         : "HTTP"
+                    }
+                ],
                 "Scheme"           : "internet-facing",
-                "SecurityGroups"   : [{"Ref" : "LoadBalancerSecurityGroup"}],
-                "Subnets"          : [{"Ref" : "Subnet1"},
-                                      {"Ref" : "Subnet2"},
-									  {"Ref" : "Subnet3"}]
+                "SecurityGroups"   : [
+                    {
+                        "Ref" : "LoadBalancerSecurityGroup"
+                    }
+                ],
+                "Subnets"          : [
+                    {
+                        "Ref" : "Subnet1"
+                    },
+                    {
+                        "Ref" : "Subnet2"
+                    },
+                    {
+                        "Ref" : "Subnet3"
+                    }
+                ]
             }
         },
-		"DNSRecord"                                       : {
+        "DNSRecord"                    : {
             "Type" : "AWS::Route53::RecordSet",
             "Properties" : {
                 "HostedZoneName" : "realvaluetalks.com.",
@@ -216,8 +237,7 @@
                 }
             }
         },
-
-        "AppPolicy" : {
+        "AppPolicy"                    : {
             "Type" : "AWS::IAM::ManagedPolicy",
             "Properties" : {
                 "Description" : "Statistics Service Policy",
@@ -236,18 +256,18 @@
                             "Effect" : "Allow",
                             "Resource" : "arn:aws:dynamodb:eu-west-1:*"
                         },
-						{
+                        {
                             "Sid" : "Deployment",
                             "Action" : [
-								"elasticloadbalancing:Describe*",
-								"elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
-								"elasticloadbalancing:RegisterInstancesWithLoadBalancer",
-								"autoscaling:Describe*",
-								"autoscaling:EnterStandby",
-								"autoscaling:ExitStandby",
-								"autoscaling:UpdateAutoScalingGroup",
-								"autoscaling:SuspendProcesses",
-								"autoscaling:ResumeProcesses"
+                                "elasticloadbalancing:Describe*",
+                                "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+                                "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
+                                "autoscaling:Describe*",
+                                "autoscaling:EnterStandby",
+                                "autoscaling:ExitStandby",
+                                "autoscaling:UpdateAutoScalingGroup",
+                                "autoscaling:SuspendProcesses",
+                                "autoscaling:ResumeProcesses"
                             ],
                             "Effect" : "Allow",
                             "Resource" : "*"
@@ -256,7 +276,7 @@
                 }
             }
         },
-        "AppRole"   : {
+        "AppRole"                      : {
             "Type" : "AWS::IAM::Role",
             "Properties" : {
                 "Path" : "/",
@@ -279,7 +299,7 @@
                 ]
             }
         },
-        "InstanceProfile" : {
+        "InstanceProfile"              : {
             "Type" : "AWS::IAM::InstanceProfile",
             "Properties" : {
                 "Path" : "/",
@@ -290,7 +310,7 @@
                 ]
             }
         },
-        "AppSecurityGroup"        : {
+        "AppSecurityGroup"             : {
             "Type" : "AWS::EC2::SecurityGroup",
             "Properties" : {
                 "VpcId" : {
@@ -315,8 +335,7 @@
                 ]
             }
         },
-
-        "AutoScalingGroup"                  : {
+        "AutoScalingGroup"             : {
             "Type" : "AWS::AutoScaling::AutoScalingGroup",
             "Properties" : {
                 "VPCZoneIdentifier" : [
@@ -342,9 +361,11 @@
                 "MaxSize"                 : "60",
                 "HealthCheckGracePeriod"  : "600",
                 "HealthCheckType"         : "ELB",
-                "LoadBalancerNames"       : [ {
-                    "Ref" : "LoadBalancer"
-                } ],
+                "LoadBalancerNames"       : [
+                    {
+                        "Ref" : "LoadBalancer"
+                    }
+                ],
                 "Tags"                    : [
                     {
                         "Key" : "Name",
@@ -369,19 +390,21 @@
                 "ImageId" : {
                     "Ref" : "Ami"
                 },
-                "SecurityGroups" : [ {
-                    "Ref" : "AppSecurityGroup"
-                } ],
+                "SecurityGroups" : [
+                    {
+                        "Ref" : "AppSecurityGroup"
+                    }
+                ],
                 "InstanceType"   : {
                     "Ref" : "Instance"
                 },
                 "IamInstanceProfile" : {
                     "Ref" : "InstanceProfile"
                 },
-				"KeyName": "UrlShortner"
+                "KeyName"            : "UrlShortner"
             }
         },
-        "AppScaleDownPolicy"            : {
+        "AppScaleDownPolicy"           : {
             "Type" : "AWS::AutoScaling::ScalingPolicy",
             "Properties" : {
                 "AdjustmentType" : "PercentChangeInCapacity",
@@ -392,7 +415,7 @@
                 "ScalingAdjustment"    : "-25"
             }
         },
-        "AppScaleUpPolicy"              : {
+        "AppScaleUpPolicy"             : {
             "Type" : "AWS::AutoScaling::ScalingPolicy",
             "Properties" : {
                 "AdjustmentType" : "PercentChangeInCapacity",
@@ -419,7 +442,7 @@
                 ]
             }
         },
-        "CPUAlarmCritical"                    : {
+        "CPUAlarmCritical"             : {
             "Type" : "AWS::CloudWatch::Alarm",
             "Properties" : {
                 "AlarmDescription" : "Scale-up if CPU > 45%",
@@ -445,7 +468,7 @@
                 "ComparisonOperator" : "GreaterThanThreshold"
             }
         },
-        "CPUAlarmHigh"                        : {
+        "CPUAlarmHigh"                 : {
             "Type" : "AWS::CloudWatch::Alarm",
             "Properties" : {
                 "AlarmDescription" : "Scale-down if CPU < 30%",
@@ -473,4 +496,3 @@
         }
     }
 }
-

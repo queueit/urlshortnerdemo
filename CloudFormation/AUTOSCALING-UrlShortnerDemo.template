@@ -3,7 +3,7 @@
     "Description"              : "UrlShortnerDemo Environment",
     "Parameters"               : {
         "Ami" : {
-            "Default" : "ami-f3fd8d80",
+            "Default" : "ami-13481860",
             "Type"    : "String"
         },
         "Instance" : {

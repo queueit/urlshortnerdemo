@@ -28,18 +28,26 @@
             "Type"        : "String",
             "AllowedValues" : [
                 "0",
-                "1",
-                "2",
                 "3",
-                "4",
-                "5",
                 "6",
-                "7",
-                "8",
                 "9",
-                "10",
+                "12",
                 "15",
-                "20"
+                "18",
+                "21",
+                "24",
+                "27",
+                "30",
+                "33",
+                "36",
+				"39",
+				"42",
+				"45",
+				"48",
+				"51",
+				"54",
+				"57",
+				"60"
             ]
         }
     },
@@ -428,16 +436,16 @@
                     {
                         "MetricIntervalLowerBound" : 0,
                         "MetricIntervalUpperBound" : 20,
-                        "ScalingAdjustment"        : 100
+                        "ScalingAdjustment"        : 200
                     },
                     {
                         "MetricIntervalLowerBound" : 20,
                         "MetricIntervalUpperBound" : 40,
-                        "ScalingAdjustment"        : 200
+                        "ScalingAdjustment"        : 300
                     },
                     {
                         "MetricIntervalLowerBound" : 40,
-                        "ScalingAdjustment"        : 300
+                        "ScalingAdjustment"        : 400
                     }
                 ]
             }
@@ -445,13 +453,13 @@
         "CPUAlarmCritical"             : {
             "Type" : "AWS::CloudWatch::Alarm",
             "Properties" : {
-                "AlarmDescription" : "Scale-up if CPU > 45%",
+                "AlarmDescription" : "Scale-up if CPU > 30%",
                 "MetricName"       : "CPUUtilization",
                 "Namespace"        : "AWS/EC2",
                 "Statistic"        : "Average",
                 "Period"           : "60",
                 "EvaluationPeriods" : "1",
-                "Threshold"         : "45",
+                "Threshold"         : "30",
                 "AlarmActions"      : [
                     {
                         "Ref" : "AppScaleUpPolicy"
@@ -471,13 +479,13 @@
         "CPUAlarmHigh"                 : {
             "Type" : "AWS::CloudWatch::Alarm",
             "Properties" : {
-                "AlarmDescription" : "Scale-down if CPU < 30%",
+                "AlarmDescription" : "Scale-down if CPU < 20%",
                 "MetricName"       : "CPUUtilization",
                 "Namespace"        : "AWS/EC2",
                 "Statistic"        : "Maximum",
                 "Period"           : "60",
                 "EvaluationPeriods" : "1",
-                "Threshold"         : "30",
+                "Threshold"         : "20",
                 "OKActions"         : [
                     {
                         "Ref" : "AppScaleDownPolicy"

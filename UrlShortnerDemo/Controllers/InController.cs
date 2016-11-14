@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Amazon;
 using Amazon.DynamoDBv2;
@@ -15,47 +16,82 @@ namespace UrlShortnerDemo.Controllers
 {
     public class InController : Controller
     {
+        private readonly IAmazonDynamoDB _client;
+
+        public InController(IAmazonDynamoDB client)
+        {
+            _client = client;
+        }
 
         public async Task<ActionResult> Index(string key)
         {
-            using (var client = new AmazonDynamoDBClient(RegionEndpoint.EUWest1))
+            return await ConcurrencyHelper.ExecuteAsync<ActionResult>(async () =>
             {
-                using (DynamoDBContext context = new DynamoDBContext(client))
-                {
+                var model = await LoadModel(key).ConfigureAwait(false);
 
-                    var model = await LoadModel(key, context).ConfigureAwait(false);
+                if (model == null)
+                    return Redirect("/");
 
-                    if (model == null)
-                        return Redirect("/");
+                await LogRedirect(key).ConfigureAwait(false);
 
-                    await LogRedirect(key, context).ConfigureAwait(false);
-
-                    return Redirect(model.Url);
-                }
-            }
+                return Redirect(model);
+            });
         }
 
-        private async Task<UrlModel> LoadModel(string key, DynamoDBContext context)
+        private async Task<string> LoadModel(string key)
         {
-            return await context.LoadAsync<UrlModel>(key).ConfigureAwait(false);
+            //using (var _client = new AmazonDynamoDBClient(
+            //    new BasicAWSCredentials("AKIAI4JMFBLBIUI5Y35A", "e/DNfxfU/TzzZQCCl4wJctPFh+HXGo/OuIa9gCxm"),
+            //    RegionEndpoint.EUWest1))
+            //{
+
+                var result = await _client.GetItemAsync("Urls", new Dictionary<string, AttributeValue>()
+                {
+                    {"UrlKey", new AttributeValue() {S = key}}
+                });
+
+                return result.Item["Url"].S;
+                //return await context.LoadAsync<UrlModel>(key).ConfigureAwait(false);
+            //}
         }
 
-        private async Task LogRedirect(string key, DynamoDBContext context)
+        private async Task LogRedirect(string key)
         {
             string userAgent = this.GetUserAgent();
             string ipAddress = this.GetIpAddress();
+            //using (var _client = new AmazonDynamoDBClient(
+            //    new BasicAWSCredentials("AKIAI4JMFBLBIUI5Y35A", "e/DNfxfU/TzzZQCCl4wJctPFh+HXGo/OuIa9gCxm"),
+            //    RegionEndpoint.EUWest1))
+            //{
 
-            await context.SaveAsync(new UrlVisitModel()
-            {
-                VisitId = Guid.NewGuid(),
-                UrlKey = key,
-                Visited = DateTime.Now,
-                User = new UserVisitModel()
+                var response = await _client.PutItemAsync("UrlVisits", new Dictionary<string, AttributeValue>()
                 {
-                    IpAddress = ipAddress,
-                    UserAgent = userAgent
-                }
-            }).ConfigureAwait(false);
+                    {"VisitId", new AttributeValue() {S = Guid.NewGuid().ToString()}},
+                    {"UrlKey", new AttributeValue() {S = key}},
+                    {"Visited", new AttributeValue() {S = DateTime.UtcNow.ToString("O")}},
+                    {
+                        "User", new AttributeValue()
+                        {
+                            M = new Dictionary<string, AttributeValue>()
+                            {
+                                {"IpAddress", new AttributeValue() {S = ipAddress}},
+                                {"UserAgent", new AttributeValue() {S = userAgent}}
+                            }
+                        }
+                    }
+                }).ConfigureAwait(false);
+            //}
+            //await context.SaveAsync(new UrlVisitModel()
+            //{
+            //    VisitId = Guid.NewGuid(),
+            //    UrlKey = key,
+            //    Visited = DateTime.Now,
+            //    User = new UserVisitModel()
+            //    {
+            //        IpAddress = ipAddress,
+            //        UserAgent = userAgent
+            //    }
+            //}).ConfigureAwait(false);
         }
 
         private StringValues GetUserAgent()

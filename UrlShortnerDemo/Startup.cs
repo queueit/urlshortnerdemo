@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Amazon;
+using Amazon.DynamoDBv2;
+using Amazon.Extensions.NETCore.Setup;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -33,10 +36,14 @@ namespace UrlShortnerDemo
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var awsOptions = Configuration.GetAWSOptions();
+            
             // Add framework services.
             services.AddApplicationInsightsTelemetry(Configuration);
 
             services.AddMvc();
+            services.AddDefaultAWSOptions(awsOptions);
+            services.AddAWSService<IAmazonDynamoDB>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

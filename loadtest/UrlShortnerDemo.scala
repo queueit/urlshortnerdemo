@@ -14,7 +14,7 @@ class UrlShortnerDemo extends Simulation {
     "longUrl" -> longUrl))
 
 	val httpProtocol = http
-		.baseURL("http://url.realvaluetalks.com")
+		.baseURL("http://localhost:5000")
     .disableFollowRedirect
 
 	val scn = scenario("UrlShortnerDemo")

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Amazon;
 using Amazon.DynamoDBv2;
@@ -15,6 +16,17 @@ namespace UrlShortnerDemo.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IAmazonDynamoDB _client;
+
+        public HomeController(IAmazonDynamoDB client)
+        {
+            _client = client;
+            //_client = new AmazonDynamoDBClient(
+            //    new BasicAWSCredentials("AKIAI4JMFBLBIUI5Y35A", "e/DNfxfU/TzzZQCCl4wJctPFh+HXGo/OuIa9gCxm"),
+            //    RegionEndpoint.EUWest1);
+            //_context = new DynamoDBContext(_client);
+        }
+
         public ActionResult Index()
         {
             return View();
@@ -36,13 +48,16 @@ namespace UrlShortnerDemo.Controllers
 
         private async Task AddToDynamo(UrlModel model)
         {
-            using (var client = new AmazonDynamoDBClient(RegionEndpoint.EUWest1))
-            {
-                using (DynamoDBContext context = new DynamoDBContext(client))
+            await ConcurrencyHelper.ExecuteAsync(async () => await _client.PutItemAsync("Urls", new Dictionary<string, AttributeValue>()
                 {
-                    await context.SaveAsync(model).ConfigureAwait(false);
-                }
-            }
+                    {"UrlKey", new AttributeValue() {S = model.UrlKey}},
+                    {"Created", new AttributeValue() {S = model.Created.ToString("O")}},
+                    {"User", new AttributeValue() {S = model.User}},
+                    {"ShortenedUrl", new AttributeValue() {S = model.ShortenedUrl}},
+                    {"Url", new AttributeValue() {S = model.Url}}
+                }).ConfigureAwait(false));
+
+            //await _context.SaveAsync(model).ConfigureAwait(false);
         }
 
         public ActionResult Error()

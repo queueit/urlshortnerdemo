@@ -37,7 +37,8 @@ namespace UrlShortnerDemo
         public void ConfigureServices(IServiceCollection services)
         {
             var awsOptions = Configuration.GetAWSOptions();
-            
+            awsOptions.Region = RegionEndpoint.EUWest1;
+
             // Add framework services.
             services.AddApplicationInsightsTelemetry(Configuration);
 

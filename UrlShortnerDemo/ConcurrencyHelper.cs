@@ -8,7 +8,7 @@ namespace UrlShortnerDemo
 {
     public static class ConcurrencyHelper
     {
-        static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(15, 15);
+        static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(18, 18);
 
         public static async Task ExecuteAsync(Func<Task> method)
         {

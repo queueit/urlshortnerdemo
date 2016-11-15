@@ -368,7 +368,9 @@
                 },
                 "MaxSize"                 : "60",
                 "HealthCheckGracePeriod"  : "600",
+				"Cooldown"				  : "180",
                 "HealthCheckType"         : "ELB",
+				
                 "LoadBalancerNames"       : [
                     {
                         "Ref" : "LoadBalancer"
@@ -484,7 +486,7 @@
                 "Namespace"        : "AWS/EC2",
                 "Statistic"        : "Maximum",
                 "Period"           : "60",
-                "EvaluationPeriods" : "1",
+                "EvaluationPeriods" : "3",
                 "Threshold"         : "20",
                 "OKActions"         : [
                     {
